@@ -4,6 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:delete": "dropdb pets-browser",
+    "db:create": "createdb pets-browser",
+    "db:schema": "psql -f schema.sql pets-browser",
+    "db:seed": "psql -f seed.sql pets-browser",
+    "db:reset": "npm run db:delete && npm run db:create && npm run db:schema && npm run db:seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
