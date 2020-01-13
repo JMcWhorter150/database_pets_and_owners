@@ -18,3 +18,4 @@ touch seed.sql
 
 - find the nouns, create tables for each
 - describe the columns for each kind of thing
+
