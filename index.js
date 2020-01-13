@@ -80,9 +80,18 @@ app.post('/pets/:id/edit', parseForm, async (req, res) => {
 
 // delete
 app.get('/pets/:id/delete', (req, res) => {
-
+    res.render('home', {
+        partials: {
+            header: 'partials/header',
+            footer: 'partials/footer',
+            content: 'partials/delete'
+        }
+    });
 })
-app.post('/pets/:id/delete')
+app.post('/pets/:id/delete', parseForm, async (req, res) => {
+    await pets.del(req.params.id);
+    res.redirect('/pets');
+})
 
 server.listen(PORT, () => {
   console.log(`Listening at PORT: ${PORT}`)
