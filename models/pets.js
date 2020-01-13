@@ -1,8 +1,9 @@
 const db = require(`./connection`);
 
 // Create
-function create() {
-
+async function create(name, species, birthdate, owner_id) {
+    const result = await db.result(`insert into pets (name, species, birthdate, owner_id) values ($1, $2, $3, $4)`, [name, species, birthdate, owner_id]);
+    return result;
 }
 
 // Retrieve

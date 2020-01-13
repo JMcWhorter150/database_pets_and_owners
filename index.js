@@ -1,19 +1,45 @@
+const http = require('http');
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+const es6Renderer = require('express-es6-template-engine');
+app.engine('html', es6Renderer);
+app.set('views', 'templates');
+app.set('view engine', 'html');
+
+const server = http.createServer(app);
+
 const pets = require('./models/pets');
 
-async function main() {
-    // pets.one(1)
-    // .then(data => {
-    //     console.log(data);
-    // })
+// see all pets
+app.get('/pets', async (req, res) => {
+    const thePets = await pets.all();
+    // res.send('you want /pets');
+    res.json(thePets);
+});
 
-    // const result = pets.del(1);
-    // console.log(result);
+// create
+app.get('/pets/create', (req, res) => {
 
-    // const result = await pets.updateName(1, 'Kevin');
-    // console.log(result);
+})
+app.post('/pets/create')
 
-    const result = await pets.updateBirthdate(1, new Date('2019-04-12'));
-    console.log(result);
-}
+// retrieve
+app.get('/pets/:id', (req, res) => { // not async function so .thening
+    pets.one(req.params.id)
+    .then(thePet => res.send(thePet));
+})
 
-main();
+// update
+app.get('/pets/:id/edit')
+app.post('/pets/:id/edit')
+
+// delete
+app.get('/pets/:id/delete')
+app.post('/pets/:id/delete')
+
+server.listen(PORT, () => {
+  console.log(`Listening at PORT: ${PORT}`)
+});
+

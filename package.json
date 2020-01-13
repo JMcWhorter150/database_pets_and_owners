@@ -9,12 +9,17 @@
     "db:schema": "psql -f schema.sql pets-browser",
     "db:seed": "psql -f seed.sql pets-browser",
     "db:reset": "npm run db:delete && npm run db:create && npm run db:schema && npm run db:seed",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.17.1",
     "pg-promise": "^10.3.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
