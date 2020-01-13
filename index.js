@@ -2,7 +2,7 @@ const http = require('http');
 const express = require('express');
 const app = express();
 const PORT = 3000;
-
+const postData = require('./render')
 const bodyParser = require('body-parser');
 const parseForm = bodyParser.urlencoded({
     extended: true
@@ -19,7 +19,8 @@ const pets = require('./models/pets');
 
 const partials = {
     header: 'partials/header',
-    footer: 'partials/footer'
+    footer: 'partials/footer',
+    nav: 'partials/nav'
 };
 
 app.get('/', (req, res) => {
@@ -32,8 +33,19 @@ app.get('/', (req, res) => {
     })
 })
 
-// see all pets
 app.get('/pets', async (req, res) => {
+    const thePets = await pets.all();
+    let content = thePets.map(postData).join('');
+    res.render('home', {
+        locals: {
+            content
+        },
+        partials
+    })
+})
+
+// see all pets
+app.get('/pets/json', async (req, res) => {
     const thePets = await pets.all();
     // res.send('you want /pets');
     res.json(thePets);
@@ -46,7 +58,8 @@ app.get('/pets/create', (req, res) => {
         partials: {
             header: 'partials/header',
             footer: 'partials/footer',
-            content: 'partials/create'
+            content: 'partials/create',
+            nav: 'partials/nav'
         }
     })
 })
