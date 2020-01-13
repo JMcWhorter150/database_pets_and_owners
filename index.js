@@ -42,15 +42,11 @@ app.get('/pets', async (req, res) => {
 // create
 app.get('/pets/create', (req, res) => {
     // const content = '/partials/form';
-    let content;
     res.render('home', {
-        locals: {
-            content
-        },
         partials: {
             header: 'partials/header',
             footer: 'partials/footer',
-            content: 'partials/form'
+            content: 'partials/create'
         }
     })
 })
@@ -67,11 +63,25 @@ app.get('/pets/:id', (req, res) => { // not async function so .thening
 })
 
 // update
-app.get('/pets/:id/edit')
-app.post('/pets/:id/edit')
+app.get('/pets/:id/edit', (req, res) => {
+    res.render('home', {
+        partials: {
+            header: 'partials/header',
+            footer: 'partials/footer',
+            content: 'partials/name'
+        }
+    });
+});
+app.post('/pets/:id/edit', parseForm, async (req, res) => {
+    const { name } = req.body;
+    const rename = await pets.updateName(req.params.id, name);
+    res.redirect('/pets');
+})
 
 // delete
-app.get('/pets/:id/delete')
+app.get('/pets/:id/delete', (req, res) => {
+
+})
 app.post('/pets/:id/delete')
 
 server.listen(PORT, () => {
