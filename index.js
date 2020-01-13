@@ -3,6 +3,11 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 
+const bodyParser = require('body-parser');
+const parseForm = bodyParser.urlencoded({
+    extended: true
+});
+
 const es6Renderer = require('express-es6-template-engine');
 app.engine('html', es6Renderer);
 app.set('views', 'templates');
@@ -11,6 +16,21 @@ app.set('view engine', 'html');
 const server = http.createServer(app);
 
 const pets = require('./models/pets');
+
+const partials = {
+    header: 'partials/header',
+    footer: 'partials/footer'
+};
+
+app.get('/', (req, res) => {
+    let content = '<h1>Hello!</h1>';
+    res.render('home', {
+        locals: {
+            content
+        },
+        partials
+    })
+})
 
 // see all pets
 app.get('/pets', async (req, res) => {
@@ -21,9 +41,24 @@ app.get('/pets', async (req, res) => {
 
 // create
 app.get('/pets/create', (req, res) => {
-
+    // const content = '/partials/form';
+    let content;
+    res.render('home', {
+        locals: {
+            content
+        },
+        partials: {
+            header: 'partials/header',
+            footer: 'partials/footer',
+            content: 'partials/form'
+        }
+    })
 })
-app.post('/pets/create')
+app.post('/pets/create', parseForm, async (req, res) => {
+    const { name, species, birthdate, owner_id } = req.body;
+    const createPet = await pets.create(name, species, birthdate, owner_id);
+    res.redirect('/pets');
+});
 
 // retrieve
 app.get('/pets/:id', (req, res) => { // not async function so .thening
