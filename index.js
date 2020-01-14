@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 
 app.get('/pets', async (req, res) => {
     const thePets = await pets.all();
-    let content = thePets.map(postData).join('');
+    let content = thePets.map(pets.postPet).join('');
     res.render('home', {
         locals: {
             content
@@ -72,7 +72,19 @@ app.post('/pets/create', parseForm, async (req, res) => {
 // retrieve
 app.get('/pets/:id', (req, res) => { // not async function so .thening
     pets.one(req.params.id)
-    .then(thePet => res.send(thePet));
+    .then(function (thePet) {
+        let content = pets.postPetPage(thePet);
+        res.render('home', {
+            locals: {
+                content
+            },
+            partials: {
+                header: 'partials/header',
+                footer: 'partials/footer',
+                nav: 'partials/nav'
+            }
+        });
+    })
 })
 
 // update
