@@ -1,7 +1,10 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const http = require('http');
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.APP_PORT || 3000;
 const render = require('./render')
 const bodyParser = require('body-parser');
 const parseForm = bodyParser.urlencoded({
@@ -42,7 +45,7 @@ function requireLogin(req, res, next) {
 app.use(session({
     store: new FileStore({}),
     // we will move this to a secure location shortly
-    secret: 'myfavoritebandisridiculous132murderbydeath'
+    secret: process.env.APP_SECRET
 }));
 
 // when we app.use(session), the session middleware adds the property 'req.session'
