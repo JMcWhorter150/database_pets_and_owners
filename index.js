@@ -70,7 +70,9 @@ app.post('/pets/create', parseForm, async (req, res) => {
 });
 
 // retrieve
-app.get('/pets/:id', (req, res) => { // not async function so .thening
+// be careful with ordering of browser location. If this was before /pets/:id, the id would be create
+// if you can't order things properly, then use the below which requires the id to be a number
+app.get('/pets/:id(\\d+)', (req, res) => { // not async function so .thening
     pets.one(req.params.id)
     .then(function (thePet) {
         let content = pets.postPetPage(thePet);
