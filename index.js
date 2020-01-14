@@ -2,12 +2,12 @@ const http = require('http');
 const express = require('express');
 const app = express();
 const PORT = 3000;
-const postData = require('./render')
+const render = require('./render')
 const bodyParser = require('body-parser');
 const parseForm = bodyParser.urlencoded({
     extended: true
 });
-
+const {convertDateToString} = require('./models/utils');
 const es6Renderer = require('express-es6-template-engine');
 app.engine('html', es6Renderer);
 app.set('views', 'templates');
@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 
 app.get('/pets', async (req, res) => {
     const thePets = await pets.all();
-    let content = thePets.map(pets.postPet).join('');
+    let content = thePets.map(render.postPet).join('');
     res.render('home', {
         locals: {
             content
@@ -55,6 +55,12 @@ app.get('/pets/json', async (req, res) => {
 app.get('/pets/create', (req, res) => {
     // const content = '/partials/form';
     res.render('home', {
+        locals: {
+            name: "",
+            species: "",
+            birthdate: "",
+            owner_id: ""
+        },
         partials: {
             header: 'partials/header',
             footer: 'partials/footer',
@@ -75,7 +81,7 @@ app.post('/pets/create', parseForm, async (req, res) => {
 app.get('/pets/:id(\\d+)', (req, res) => { // not async function so .thening
     pets.one(req.params.id)
     .then(function (thePet) {
-        let content = pets.postPetPage(thePet);
+        let content = render.postPetPage(thePet);
         res.render('home', {
             locals: {
                 content
@@ -90,14 +96,23 @@ app.get('/pets/:id(\\d+)', (req, res) => { // not async function so .thening
 })
 
 // update
-app.get('/pets/:id/edit', (req, res) => {
+app.get('/pets/:id/edit', async (req, res) => {
+    const { id } = req.params;
+    const thePet = await pets.one(id);
     res.render('home', {
+        locals: {
+            name: `${thePet.name}`,
+            species: `${thePet.species}`,
+            birthdate: `${convertDateToString(thePet.birthdate)}`,
+            owner_id: `${thePet.owner_id}`
+        },
         partials: {
             header: 'partials/header',
             footer: 'partials/footer',
-            content: 'partials/name'
+            content: 'partials/create',
+            nav: 'partials/nav'
         }
-    });
+    })
 });
 app.post('/pets/:id/edit', parseForm, async (req, res) => {
     const { name } = req.body;
@@ -111,6 +126,7 @@ app.get('/pets/:id/delete', (req, res) => {
         partials: {
             header: 'partials/header',
             footer: 'partials/footer',
+            nav: 'partials/nav',
             content: 'partials/delete'
         }
     });

@@ -1,4 +1,5 @@
 const db = require(`./connection`);
+const {convertDateToString} = require('./utils');
 
 // Create
 async function create(name, species, birthdate, owner_id) {
@@ -48,16 +49,7 @@ async function updateName(id, name) {
 
 async function updateBirthdate(id, dateObject) {
     // Postgres wants this `2020-01-13`
-    const year = dateObject.getFullYear(); // YYYY
-    let month = dateObject.getMonth() + 1; // MM
-    if (month < 10) {
-        month = `0${month}`;
-    }
-    let day = dateObject.getDate();
-    if (day < 10) {
-        day = `0${day}`;
-    }
-    const dateString = `${year}-${month}-${day}`;
+    const dateString = convertDateToString(dateObject);
     const result = await db.result(`update pets set birthdate=$1 where id=$2`, [dateString, id]);
     return result;
 }
