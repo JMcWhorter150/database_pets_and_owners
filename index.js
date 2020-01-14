@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const parseForm = bodyParser.urlencoded({
     extended: true
 });
+const owners = require('./models/owners');
 const {convertDateToString} = require('./models/utils');
 const es6Renderer = require('express-es6-template-engine');
 app.engine('html', es6Renderer);
@@ -148,8 +149,15 @@ app.post('/pets/:id/delete', parseForm, async (req, res) => {
 app.get('/login', (req, res) => {
     res.render('owners/auth');
 })
-app.post('/login', parseForm, (req, res) => {
-    console.log(req.body);
+app.post('/login', parseForm, async (req, res) => {
+    const {name, password} = req.body;
+    const didLogin = await owners.login(name, password);
+    if (didLogin) {
+        console.log('yay! you logged in!');
+    } else {
+        console.log('boo! That is not correct');
+    }
+
 })
 // "Profile" - list pets for this owner
 app.get('/profile')
