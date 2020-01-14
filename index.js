@@ -176,14 +176,26 @@ app.post('/login', parseForm, async (req, res) => {
     const {name, password} = req.body;
     const didLogin = await owners.login(name, password);
     if (didLogin) {
+        // assuming users have unique names:
+        const theUser = await owners.getByUsername(name);
+
+        // add some info to the user's session
+        req.session.user = {
+            name,
+            id: theUser.id
+        };
+        req.session.save();
         console.log('yay! you logged in!');
+        res.redirect('/profile');
     } else {
         console.log('boo! That is not correct');
     }
 
 })
 // "Profile" - list pets for this owner
-app.get('/profile')
+app.get('/profile', (req, res) => {
+    res.send(`Welcome back ${req.session.user.name}`)
+})
 
 server.listen(PORT, () => {
   console.log(`Listening at PORT: ${PORT}`)
