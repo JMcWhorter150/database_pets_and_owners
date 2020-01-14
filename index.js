@@ -118,8 +118,12 @@ app.get('/pets/:id/edit', async (req, res) => {
 app.post('/pets/:id/edit', parseForm, async (req, res) => {
     const {id} = req.params;
     const { name, birthdate, species, owner_id } = req.body;
-    await pets.update(id, name, species, birthdate);
-    res.redirect('/pets');
+    const result =  pets.update(id, name, species, birthdate);
+    if (result) {
+        res.redirect(`/pets/${id}`);
+    } else {
+        res.redirect(`/pets/${id}/edit`);
+    }
 })
 
 // delete
