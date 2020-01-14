@@ -7,6 +7,11 @@ const bodyParser = require('body-parser');
 const parseForm = bodyParser.urlencoded({
     extended: true
 });
+// This is the session management middleware created by the Express.js team
+const session = require('express-session');
+// Give us a modified version of the express team's session management software
+// We want one that can save session info to a file on the hard drive
+const FileStore = require('session-file-store')(session);
 const owners = require('./models/owners');
 const {convertDateToString} = require('./models/utils');
 const es6Renderer = require('express-es6-template-engine');
@@ -23,6 +28,24 @@ const partials = {
     footer: 'partials/footer',
     nav: 'partials/nav'
 };
+
+app.use(session({
+    store: new FileStore({}),
+    // we will move this to a secure location shortly
+    secret: 'myfavoritebandisridiculous132murderbydeath'
+}));
+
+// when we app.use(session), the session middleware adds the property 'req.session'
+// as the user browses from page to page, their browser shows us a 'cookie',
+// and the session middleware attaches that user's session info to the req.
+
+// Let's see what's in the session
+app.use((req, res, next) => {
+    console.log('********');
+    console.log(req.session);
+    console.log('********');
+    next();
+})
 
 app.get('/', (req, res) => {
     let content = '<h1>Hello!</h1>';
