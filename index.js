@@ -29,6 +29,16 @@ const partials = {
     nav: 'partials/nav'
 };
 
+function requireLogin(req, res, next) {
+    if (req.session && req.session.user) {
+        console.log('requireLogin says you are OK')
+        next();
+    } else {
+        console.log('Stranger Danger!!!!')
+        res.redirect('/login');
+    }
+}
+
 app.use(session({
     store: new FileStore({}),
     // we will move this to a secure location shortly
@@ -76,7 +86,7 @@ app.get('/pets/json', async (req, res) => {
 });
 
 // create
-app.get('/pets/create', (req, res) => {
+app.get('/pets/create', requireLogin, (req, res) => {
     // const content = '/partials/form';
     res.render('home', {
         locals: {
@@ -93,8 +103,9 @@ app.get('/pets/create', (req, res) => {
         }
     })
 })
-app.post('/pets/create', parseForm, async (req, res) => {
-    const { name, species, birthdate, owner_id } = req.body;
+app.post('/pets/create', requireLogin, parseForm, async (req, res) => {
+    const { name, species, birthdate } = req.body;
+    const owner_id = req.session.user.id;
     const createPet = await pets.create(name, species, birthdate, owner_id);
     res.redirect('/pets');
 });
@@ -120,7 +131,7 @@ app.get('/pets/:id(\\d+)', (req, res) => { // not async function so .thening
 })
 
 // update
-app.get('/pets/:id/edit', async (req, res) => {
+app.get('/pets/:id/edit', requireLogin, async (req, res) => {
     const { id } = req.params;
     const thePet = await pets.one(id);
     res.render('home', {
@@ -139,7 +150,7 @@ app.get('/pets/:id/edit', async (req, res) => {
     })
 });
 // need to play around with this
-app.post('/pets/:id/edit', parseForm, async (req, res) => {
+app.post('/pets/:id/edit', requireLogin, parseForm, async (req, res) => {
     const {id} = req.params;
     const { name, birthdate, species, owner_id } = req.body;
     const result =  pets.update(id, name, species, birthdate);
@@ -151,7 +162,7 @@ app.post('/pets/:id/edit', parseForm, async (req, res) => {
 })
 
 // delete
-app.get('/pets/:id/delete', (req, res) => {
+app.get('/pets/:id/delete', requireLogin, (req, res) => {
     res.render('home', {
         partials: {
             header: 'partials/header',
@@ -162,7 +173,7 @@ app.get('/pets/:id/delete', (req, res) => {
     });
 })
 
-app.post('/pets/:id/delete', parseForm, async (req, res) => {
+app.post('/pets/:id/delete', requireLogin, parseForm, async (req, res) => {
     await pets.del(req.params.id);
     res.redirect('/pets');
 })
@@ -184,17 +195,29 @@ app.post('/login', parseForm, async (req, res) => {
             name,
             id: theUser.id
         };
-        req.session.save();
+        req.session.save(() => {
+            console.log('saved');
+            res.redirect('/profile');
+        });
         console.log('yay! you logged in!');
-        res.redirect('/profile');
     } else {
         console.log('boo! That is not correct');
     }
 
 })
+
+app.get('/logout', (req, res) => {
+    // Get rid of the user's session!
+    // Then redirect them to the login page.
+    // This is the magic logout function. 
+    req.session.destroy(() => {
+        // this avoids a longstanding bug in session middleware
+        res.redirect('/login');
+    });
+})
 // "Profile" - list pets for this owner
 app.get('/profile', (req, res) => {
-    res.send(`Welcome back ${req.session.user.name}`)
+    res.send(`Welcome back ${req.session.user.name}`);
 })
 
 server.listen(PORT, () => {

@@ -37,5 +37,6 @@ function getById(id) {
 // delete
 module.exports = {
     create,
-    login
+    login,
+    getByUsername
 };
