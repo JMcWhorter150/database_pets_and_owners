@@ -114,9 +114,11 @@ app.get('/pets/:id/edit', async (req, res) => {
         }
     })
 });
+// need to play around with this
 app.post('/pets/:id/edit', parseForm, async (req, res) => {
-    const { name } = req.body;
-    const rename = await pets.updateName(req.params.id, name);
+    const {id} = req.params;
+    const { name, birthdate, species, owner_id } = req.body;
+    await pets.update(id, name, species, birthdate);
     res.redirect('/pets');
 })
 

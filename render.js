@@ -16,7 +16,7 @@ function postPetPage(obj) {
     <li>${obj.birthdate}</li>
     <li>${obj.owner_id}</li>
     <li><a href="/pets/${obj.id}/delete">Delete Pet</a></li>
-    <li><a href="/pets/${obj.id}/edit">Rename Pet</a></li>`
+    <li><a href="/pets/${obj.id}/edit">Edit Pet</a></li>`
     return result;
 }
 

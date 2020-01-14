@@ -28,8 +28,8 @@ function one(id) {
 async function all() {
     try {
         // .query and .any are the same function
-        const allPets = await db.query(`select * from pets;`)
-                console.log(allPets);
+        const allPets = await db.query(`select * from pets order by id;`)
+                // console.log(allPets);
                 return allPets;
     } catch (err) {
         console.log(err);
@@ -38,20 +38,13 @@ async function all() {
 }
 
 // Update
-async function updateName(id, name) {
-    const result = await db.result(`update pets set name=$1 where id=$2;`, [name, id]);
+async function update(id, name, species, birthdate) {
+    const result = await db.result(`update pets set name=$2, species=$3, birthdate=$4 where id=$1;`, [id, name, species, birthdate]);
     if (result.rowCount === 1) {
         return id;
     } else {
         return null;
     }
-}
-
-async function updateBirthdate(id, dateObject) {
-    // Postgres wants this `2020-01-13`
-    const dateString = convertDateToString(dateObject);
-    const result = await db.result(`update pets set birthdate=$1 where id=$2`, [dateString, id]);
-    return result;
 }
 // Delete
 
@@ -69,7 +62,6 @@ module.exports = {
     create,
     one,
     all,
-    updateName,
-    updateBirthdate,
+    update,
     del
 }
