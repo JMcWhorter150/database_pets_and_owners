@@ -137,10 +137,22 @@ app.get('/pets/:id/delete', (req, res) => {
         }
     });
 })
+
 app.post('/pets/:id/delete', parseForm, async (req, res) => {
     await pets.del(req.params.id);
     res.redirect('/pets');
 })
+
+
+// Login!
+app.get('/login', (req, res) => {
+    res.render('owners/auth');
+})
+app.post('/login', parseForm, (req, res) => {
+    console.log(req.body);
+})
+// "Profile" - list pets for this owner
+app.get('/profile')
 
 server.listen(PORT, () => {
   console.log(`Listening at PORT: ${PORT}`)

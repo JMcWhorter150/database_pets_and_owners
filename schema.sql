@@ -1,7 +1,8 @@
 create table owners(
     id serial primary key,
     name text,
-    phone_number varchar(20)
+    phone_number varchar(20),
+    hash text
 );
 
 create table pets(
